@@ -54,7 +54,6 @@ class GAGMacro:
         
         center_x, center_y = coordinates
         self.click(center_x, center_y)
-        print(f"Clicked at center: ({center_x}, {center_y})")
         return True
 
     def click_image(self, image_name, confidence=0.9):

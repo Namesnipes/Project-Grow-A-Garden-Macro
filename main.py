@@ -1,6 +1,5 @@
 import time
-
-from macro import GAGMacro
+from base.MacroManager import GAGMacro
 
 
 if __name__ == '__main__':
@@ -8,9 +7,14 @@ if __name__ == '__main__':
     time.sleep(3)
 
     macro = GAGMacro()
+    game_actions = macro.game_actions
     
     if macro.setup_window():
-        time.sleep(1)
+        time.sleep(0.5)
         macro.click_center()
         time.sleep(1)
-        macro.click(477, 131)
+        game_actions.goto_garden()
+        time.sleep(1)
+        game_actions.goto_seeds()
+        time.sleep(1)
+        game_actions.goto_sell()

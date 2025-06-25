@@ -11,5 +11,10 @@
     "win32": 8,
     "darwin": 0,
     "linux": 5
+  },
+  "game_elements":{
+    "seed_button": [247, 88],
+    "garden_button": [398, 88],
+    "sell_button": [553,88]
   }
 }

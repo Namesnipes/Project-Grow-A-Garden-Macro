@@ -1,0 +1,15 @@
+{
+  "window_title_contains": "Roblox",
+  "standard_width":  800,
+  "standard_height": 600,
+  "title_bar_offsets": {
+    "win32": 30,
+    "darwin": 28,
+    "linux": 35
+  },
+  "border_offsets": {
+    "win32": 8,
+    "darwin": 0,
+    "linux": 5
+  }
+}

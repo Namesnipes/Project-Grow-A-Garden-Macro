@@ -166,6 +166,18 @@ class GameActions:
         """
         Consistently sets an optimal angle to walk around
         """
+        def toggle_follow_mode():
+            pydirectinput.press("esc")
+            sleep(0.4)
+            pydirectinput.press("tab")
+            sleep(0.3)
+            pydirectinput.press("down")
+            sleep(0.3)
+            pydirectinput.press("right")
+            sleep(0.3)
+            pydirectinput.press("right")
+            sleep(0.3)
+            pydirectinput.press("esc")
         self.macro.click_center()
         pyautogui.scroll(1000000) # Going first person
         sleep(0.2)
@@ -180,18 +192,7 @@ class GameActions:
         pyautogui.scroll(-2500) # Going third person
         print(f"Camera zoom set. Aligning... ")
 
-        pydirectinput.press("esc")
-        sleep(0.4)
-        settings_coords = self.game_elements.get("settings_button")
-        self.macro.click(*settings_coords)
-        sleep(0.3)
-        change_camera_mode = self.game_elements.get("change_camera_mode")
-        self.macro.move(*change_camera_mode) # Move our mouse here, so the color changes.
-        while not self.macro.find_image("templates\cameramode_follow.png"):
-            self.macro.click(*change_camera_mode)
-            sleep(0.5)
-
-        pydirectinput.press("esc")
+        toggle_follow_mode()
         sleep(0.5)
         pyautogui.scroll(-3000)
         sleep(0.2)
@@ -203,16 +204,6 @@ class GameActions:
             sleep(0.05)
         pydirectinput.PAUSE = 0.05
         
-        pydirectinput.press("esc")
-        sleep(0.5)
-        self.macro.click(*settings_coords)
-        sleep(0.3)
-        self.macro.click(*change_camera_mode)
-        sleep(0.05)
-        pyautogui.scroll(-500)
-        sleep(0.05)
-        self.macro.click(*self.game_elements.get("worst_quality")) # Setting the worst graphics quality for fps
-        sleep(0.5)
-        pydirectinput.press("esc")
-        print(f"Camera and settings complete! ")
+        toggle_follow_mode()
+        print("Camera and settings complete!")
         sleep(0.5)

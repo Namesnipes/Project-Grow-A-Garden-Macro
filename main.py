@@ -12,10 +12,4 @@ if __name__ == '__main__':
     if macro.setup_window():
         time.sleep(0.5)
         game_actions.set_camera_and_settings()
-        time.sleep(1)
-        #game_actions.goto_garden()
-        time.sleep(1)
-        #game_actions.goto_seeds()
-        time.sleep(1)
-        #game_actions.goto_sell()
         

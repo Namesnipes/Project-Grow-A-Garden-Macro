@@ -9,8 +9,6 @@ class WindowManager:
     def __init__(self, config_path='config.json'):
         self.config = self._load_config(config_path)
         self.os_name = sys.platform
-        
-        self.asset_path = os.path.join('assets', self.os_name)
 
         self.window = None
         self.yOffset = self.config['title_bar_offsets'].get(self.os_name, 30)
@@ -35,23 +33,24 @@ class WindowManager:
         self.window = windows[0]
         try:
             self.window.activate()
-            sleep(0.5)
+            sleep(0.3)
             self.window.maximize()
-            sleep(0.5)
+            sleep(0.3)
             self.window.moveTo(0, 0)
-            sleep(0.5)
+            sleep(0.3)
             self.window.resizeTo(self.config['standard_width'], self.config['standard_height'])
             sleep(0.5)
-
             # get client offset
             location = pyautogui.locateCenterOnScreen(
                 "templates/seeds.png",
-                region=self.window.box
+                region=self.window.box,
+                confidence=0.95
             )
-            if location is not None:
-                self.xOffset = location.x - self.config.get("game_elements").get("seed_button")[0]
-                self.yOffset = location.y - self.config.get("game_elements").get("seed_button")[1]
-                print(f"Height and width of top bar/sidebar: {self.xOffset}, y: {self.yOffset}")
+
+            self.xOffset = location.x - self.config.get("game_elements").get("seed_button")[0]
+            self.yOffset = location.y - self.config.get("game_elements").get("seed_button")[1]
+            print(f"Height and width of top bar/sidebar: {self.xOffset}, y: {self.yOffset}")
+
         except Exception as e:
             print(f"Error standardizing window: {e}")
             return False

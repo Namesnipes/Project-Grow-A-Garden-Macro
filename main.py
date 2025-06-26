@@ -11,10 +11,11 @@ if __name__ == '__main__':
     
     if macro.setup_window():
         time.sleep(0.5)
-        macro.click_center()
+        game_actions.set_camera_and_settings()
         time.sleep(1)
-        game_actions.goto_garden()
+        #game_actions.goto_garden()
         time.sleep(1)
-        game_actions.goto_seeds()
+        #game_actions.goto_seeds()
         time.sleep(1)
-        game_actions.goto_sell()
+        #game_actions.goto_sell()
+        

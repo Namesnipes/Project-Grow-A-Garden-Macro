@@ -1,5 +1,6 @@
 import pyautogui
 import pydirectinput
+from pytweening import easeOutCirc
 import sys
 from time import sleep
 import json
@@ -11,6 +12,9 @@ class GAGMacro:
         self.os_name = sys.platform
         self.asset_path = os.path.join('assets', self.os_name)
         self.config = self._load_config(config_path)
+
+        pyautogui.PAUSE = 0 # Removing the built-in delay completely bcs we won't use this for inputs
+        pydirectinput.PAUSE = 0.05 # Lowering the built-in delay, but leaving a small one so the clicks and movements register
 
         self.window_manager = WindowManager(config_path)
         self.game_actions = GameActions(self)
@@ -41,6 +45,20 @@ class GAGMacro:
         else:
             pyautogui.moveTo(x, y)
             pyautogui.click()
+
+    def move(self, x, y):
+        """
+            Clicks at x, y in CLIENT coordinates (ignores window title bar and border).
+        """
+        # convert to client coordinates
+        x = x + self.window_manager.xOffset
+        y = y + self.window_manager.yOffset
+        if self.os_name == 'win32':
+            pydirectinput.moveTo(x, y)
+            pydirectinput.moveRel(1,1)
+            pydirectinput.moveRel(-1,-1)
+        else:
+            pyautogui.moveTo(x, y)
 
     def click_center(self):
         """
@@ -82,9 +100,27 @@ class GAGMacro:
                 print(f"Error: Could not find '{image_name}' on screen.")
                 return False
         except pyautogui.PyAutoGUIException as e:
-            print(f"Error during image search. Ensure OpenCV is installed (`pip install opencv-python`). Details: {e}")
+            print(f"Error during image search. Details: {e}")
             return False
 
+    def find_image(self, image_name, confidence=0.9):
+        """
+        Checks if an image is on the screen.
+        """
+
+        if not os.path.exists(image_name):
+            print(f"Error: Image asset not found at '{image_name}'")
+            return False
+
+        try:
+            pyautogui.locateOnScreen(image_name, confidence=confidence, region=self.window.box)
+            # If above succeeds, we can just return True, since it returns an exeption if it fails
+            return True
+        except pyautogui.ImageNotFoundException:
+            return False
+        except pyautogui.PyAutoGUIException as e:
+            print(f"Error during image search. Details: {e}")
+        
     def setup_window(self):
         """
         Sets up the window using the WindowManager.
@@ -125,3 +161,58 @@ class GameActions:
         """
         sell_coords = self.game_elements.get('sell_button')
         return self.macro.click(*sell_coords)
+    
+    def set_camera_and_settings(self):
+        """
+        Consistently sets an optimal angle to walk around
+        """
+        self.macro.click_center()
+        pyautogui.scroll(1000000) # Going first person
+        sleep(0.2)
+
+        # Looking up. (windows only)
+        pydirectinput.PAUSE = 0.002 # Temporarely, because this part would be too slow otherwise
+        for i in range(1, 100):
+            pydirectinput.moveRel(0,int(200*easeOutCirc(i/100))) # A fucking genius way of bypassing what I think is Roblox trying to prevent robotic mouse movement
+        pydirectinput.PAUSE = 0.05
+
+        sleep(0.3)
+        pyautogui.scroll(-2500) # Going third person
+        print(f"Camera zoom set. Aligning... ")
+
+        pydirectinput.press("esc")
+        sleep(0.4)
+        settings_coords = self.game_elements.get("settings_button")
+        self.macro.click(*settings_coords)
+        sleep(0.3)
+        change_camera_mode = self.game_elements.get("change_camera_mode")
+        self.macro.move(*change_camera_mode) # Move our mouse here, so the color changes.
+        while not self.macro.find_image("templates\cameramode_follow.png"):
+            self.macro.click(*change_camera_mode)
+            sleep(0.5)
+
+        pydirectinput.press("esc")
+        sleep(0.5)
+        pyautogui.scroll(-3000)
+        sleep(0.2)
+        pydirectinput.PAUSE = 0 # Temporarely, because this part would be too slow otherwise
+        for i in range(0,6): # Abusing the follow camera mode to align the camera
+            self.goto_seeds()
+            sleep(0.05)
+            self.goto_sell()
+            sleep(0.05)
+        pydirectinput.PAUSE = 0.05
+        
+        pydirectinput.press("esc")
+        sleep(0.5)
+        self.macro.click(*settings_coords)
+        sleep(0.3)
+        self.macro.click(*change_camera_mode)
+        sleep(0.05)
+        pyautogui.scroll(-500)
+        sleep(0.05)
+        self.macro.click(*self.game_elements.get("worst_quality")) # Setting the worst graphics quality for fps
+        sleep(0.5)
+        pydirectinput.press("esc")
+        print(f"Camera and settings complete! ")
+        sleep(0.5)

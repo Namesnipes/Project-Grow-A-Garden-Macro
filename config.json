@@ -15,6 +15,9 @@
   "game_elements":{
     "seed_button": [247, 88],
     "garden_button": [398, 88],
-    "sell_button": [553,88]
+    "sell_button": [553,88],
+    "settings_button": [245,91],
+    "change_camera_mode": [340,214],
+    "worst_quality": [391,359]
   }
 }

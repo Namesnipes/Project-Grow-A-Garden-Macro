@@ -12,4 +12,5 @@ if __name__ == '__main__':
     if macro.setup_window():
         time.sleep(0.5)
         game_actions.set_camera_and_settings()
+        game_actions.sell_inventory()
         

@@ -1,5 +1,5 @@
 {
-  "window_title_contains": "Roblox",
+  "window_title": "Roblox",
   "standard_width":  800,
   "standard_height": 600,
   "title_bar_offsets": {
@@ -19,9 +19,12 @@
     "settings_button": [245,91],
     "change_camera_mode": [340,214],
     "worst_quality": [391,359],
-    "backpack_search_bar": [631, 230],
+    "backpack_search_bar": [608, 230],
     "top_left_item_slot": [109, 279],
     "item_slot_two": [173, 563],
     "sell_inventory": [574,276]
+  },
+  "keybinds": {
+    "recall_wrench": "2"
   }
 }

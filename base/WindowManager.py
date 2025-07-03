@@ -23,13 +23,13 @@ class WindowManager:
     def setup_window(self):
         """Finds, activates, and standardizes the target window."""
         
-        windows = pyautogui.getWindowsWithTitle(self.config['window_title_contains'])
+        windows = pyautogui.getWindowsWithTitle(self.config['window_title']) # type: ignore
         if not windows:
             print("Error: Roblox window not found.")
             return False
         
         # get window containing only "Roblox"
-        windows = [w for w in windows if self.config['window_title_contains'] in w.title]
+        windows = [w for w in windows if self.config['window_title'] == w.title]
         self.window = windows[0]
         try:
             self.window.activate()
@@ -46,13 +46,13 @@ class WindowManager:
                 region=self.window.box,
                 confidence=0.95
             )
-
-            self.xOffset = location.x - self.config.get("game_elements").get("seed_button")[0]
-            self.yOffset = location.y - self.config.get("game_elements").get("seed_button")[1]
-            print(f"Height and width of top bar/sidebar: {self.xOffset}, y: {self.yOffset}")
+            if location:
+                self.xOffset = location.x - self.config.get("game_elements").get("seed_button")[0]
+                self.yOffset = location.y - self.config.get("game_elements").get("seed_button")[1]
+                print(f"Height and width of top bar/sidebar: {self.xOffset}, y: {self.yOffset}")
 
         except Exception as e:
-            print(f"Error standardizing window: {e}")
+            print(f"Error standardizing window {e}")
             return False
             
         print("Window setup complete!")

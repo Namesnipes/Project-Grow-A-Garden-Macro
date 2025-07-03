@@ -18,6 +18,9 @@
     "sell_button": [553,88],
     "settings_button": [245,91],
     "change_camera_mode": [340,214],
-    "worst_quality": [391,359]
+    "worst_quality": [391,359],
+    "backpack_search_bar": [631, 230],
+    "top_left_item_slot": [109, 279],
+    "item_slot_two": [173, 563]
   }
 }

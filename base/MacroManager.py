@@ -207,3 +207,37 @@ class GameActions:
         toggle_follow_mode()
         print("Camera and settings complete!")
         sleep(0.5)
+    
+        def putRecallWrenchInHotbar():
+            """
+            Puts the recall wrench in the hotbar using pydirectinput.
+
+            Opens the backpack (`), selects backpackSearchBar, types "recall" and
+            presses enter, then drags the mouse from topLeftItemSlot to itemSlotTwo.
+            """
+            pydirectinput.press('`')  # Open the backpack
+            sleep(0.5)
+            pydirectinput.click(*self.game_elements.get("backpack_search_bar"))  # Move to the search bar and click
+            sleep(0.5)
+            # Send ctrl+a then delete to clear the search bar
+            pyautogui.hotkey('ctrl', 'a')  # Select all text in the search bar
+            sleep(0.2)
+            pydirectinput.press('delete')  # Press delete to clear the search bar
+            sleep(0.2)
+            pydirectinput.write('recall') # Type the search term
+            sleep(0.2)
+            pydirectinput.press('enter')  # Press enter to search
+            sleep(0.5)
+            
+            # Drag the recall wrench from the top left item slot to item slot two
+            # pydirectinput's drag is a two-step process: move to start, then drag to end
+            pydirectinput.moveTo(
+                *self.game_elements.get("top_left_item_slot")
+            )
+            pydirectinput.dragTo(
+                *self.game_elements.get("item_slot_two")
+            )
+            sleep(0.5)
+            
+            pydirectinput.press('`') # Close the backpack
+            sleep(0.5)

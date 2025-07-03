@@ -190,7 +190,6 @@ class GameActions:
 
         sleep(0.3)
         pyautogui.scroll(-2500) # Going third person
-        print(f"Camera zoom set. Aligning... ")
 
         toggle_follow_mode()
         sleep(0.5)
@@ -207,6 +206,16 @@ class GameActions:
         toggle_follow_mode()
         print("Camera and settings complete!")
         sleep(0.5)
+
+    def sell_inventory(self):
+        print(f"Selling inventory... ")
+        self.goto_sell()
+        sleep(0.2)
+        pydirectinput.press("e")
+        sleep(2)
+        self.macro.click(*self.game_elements.get("sell_inventory"))
+        sleep(1)
+
     
         def putRecallWrenchInHotbar():
             """

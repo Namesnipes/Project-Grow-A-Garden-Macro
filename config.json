@@ -22,7 +22,14 @@
     "backpack_search_bar": [608, 230],
     "top_left_item_slot": [109, 279],
     "item_slot_two": [173, 563],
-    "sell_inventory": [574,276]
+    "sell_inventory": [574,276],
+    "gear_option_one": [571, 286]
+  },
+  "regions": {
+    "gear_shop": [195, 188, 604, 507]
+  },
+  "shop_items": {
+    "gear": ["Watering Can", "Trowel", "Recall Wrench", "Basic Sprinkler", "Advanced Sprinkler", "Godly Sprinkler", "Magnifying Glass", "Tanning Mirror", "Master Sprinkler", "Cleaning Spray", "Favorite Tool", "Harvest Tool", "Friendship Pot"]
   },
   "keybinds": {
     "recall_wrench": "2"

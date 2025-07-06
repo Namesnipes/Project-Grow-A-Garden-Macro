@@ -10,3 +10,4 @@ PyScreeze==1.0.1
 pytweening==1.2.0
 six==1.17.0
 opencv-python==4.11.0.86
+screen_ocr[winrt]

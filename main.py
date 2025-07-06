@@ -16,4 +16,4 @@ if __name__ == '__main__':
         sleep(0.5)  
         game_actions.put_recall_wrench_in_hotbar()
         sleep(0.5)
-        game_actions.buy_from_egg_shop()
+        game_actions.buy_from_gear_shop()

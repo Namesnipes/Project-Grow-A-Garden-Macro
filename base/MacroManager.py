@@ -1,5 +1,7 @@
 from datetime import datetime
 import logging
+import cv2
+import numpy as np
 import pyautogui
 import pydirectinput
 from pytweening import easeOutCirc
@@ -10,6 +12,7 @@ import os
 import functools
 from .WindowManager import WindowManager
 import pygetwindow as gw
+from PIL import ImageGrab
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -88,7 +91,7 @@ class GAGMacro:
             pyautogui.click()
     
     @ensure_roblox_active
-    def click_abs(self, x, y):
+    def click_abs(self, x, y, clicks=1):
         """
         Clicks at x, y in CLIENT coordinates (ignores window title bar and border).
         """
@@ -96,7 +99,8 @@ class GAGMacro:
             pydirectinput.moveTo(x, y)
             pydirectinput.moveRel(1, 1)
             pydirectinput.moveRel(-1, -1)
-            pydirectinput.click()
+            for _ in range(clicks):
+                pydirectinput.click()
         else:
             pyautogui.moveTo(x, y)
             pyautogui.click()
@@ -153,6 +157,41 @@ class GAGMacro:
         center_x, center_y = coordinates
         self.click(center_x, center_y)
         return True
+    
+    def move_center(self):
+        """
+        Clicks the center of the current window.
+        """
+
+        coordinates = self.window_manager.get_center_coordinates()
+        if coordinates is None:
+            print("Error: Could not get center coordinates")
+            return False
+
+        center_x, center_y = coordinates
+        self.move(center_x, center_y)
+        return True
+    
+    def click_color(self, hex, clicks=1):
+        hex = hex.lstrip("#")
+        rgb = tuple(int(hex[i : i + 2], 16) for i in (0, 2, 4))
+
+        # Take a screenshot of the entire screen
+        screenshot = ImageGrab.grab()
+        screenshot_np = np.array(screenshot)
+
+        # Convert the screenshot to RGB format
+        screenshot_rgb = cv2.cvtColor(screenshot_np, cv2.COLOR_BGR2RGB)
+
+        # Find all pixels that match the target color
+        matching_pixels = np.where(np.all(screenshot_rgb == rgb, axis=-1))
+
+        if matching_pixels[0].size > 0:
+            # Click the first matching pixel
+            x, y = matching_pixels[1][0], matching_pixels[0][0]
+            print(f"Found color {hex} at ({x}, {y}). Clicking...")
+            
+            self.click_abs(x, y, clicks=clicks)
 
     def click_image(self, image_name, confidence=0.9, debug_string=None):
             """
@@ -237,6 +276,9 @@ class GameActions:
     def __init__(self, macro):
         self.macro = macro
         self.game_elements = self.macro.config.get("game_elements")
+        self.regions = self.macro.config.get("regions", {})
+        self.shop_items = self.macro.config.get("shop_items", {})
+        self.window_manager = self.macro.window_manager
 
     def goto_seeds(self):
         """
@@ -354,9 +396,6 @@ class GameActions:
             *self.game_elements.get("backpack_search_bar")
         ) 
         sleep(0.5)
-        # Send ctrl+a then delete to clear the search bar
-        pydirectinput.press("delete")
-        sleep(0.2)
         pydirectinput.write("recall")  # Type the search term
         sleep(0.2)
         pydirectinput.press("enter")  # Press enter to search
@@ -403,16 +442,55 @@ class GameActions:
             self.macro.click_image(confirm_image, confidence=0.85, debug_string="egg_purchase")
             sleep(0.5)
     
-    def close_gui(self, button_image_name, confidence=0.85):
+    def buy_from_gear_shop(self):
+        """
+        Automatically buys items from the Gear Shop.
+        """
+        self.goto_gear_shop()
+        sleep(1)
+        pydirectinput.press('e')  # Open the gear shop
+        sleep(2)
+        self.macro.click(*self.game_elements.get("gear_option_one"))
+        sleep(2)
+        self.macro.move_center()
+        sleep(1)
+        pyautogui.scroll(10000)  # Scroll to the top of the gear shop
+        sleep(1)
+        region = self.regions.get("gear_shop", [0, 0, 800, 600])
+        gear_items = self.shop_items.get("gear", []).copy()
+
+
+        for i in range(len(gear_items)):
+            words = self.window_manager.get_words_in_bounding_box(region)
+            for word, coords in words:
+                word = word.lower()
+                for gear in gear_items:
+                    found = False
+                    if gear.lower() in word:
+                        logging.info(f"Found gear item: {gear} at {coords}")
+                        self.macro.click_abs(*coords)
+                        sleep(1)
+                        self.macro.click_color("26ee26", clicks=25)
+                        found = True
+                        gear_items.remove(gear)  # Remove the item from the list to prevent re-finding it
+                        break
+                if found:
+                    break
+            sleep(0.5)
+            pyautogui.scroll(-116)
+            sleep(0.5)
+        self.close_gui()
+
+    def close_gui(self):
         """
         Closes a GUI by finding and double-clicking a specified close button.
         """
-        logging.info(f"Attempting to close GUI by double-clicking: '{button_image_name}'")
+        logging.info("Attempting to close GUI by double-clicking the shop")
 
-        if self.macro.click_image(button_image_name, confidence=confidence):
+        if self.macro.click_image("shop.png"):
             logging.info("First click successful. Performing second click.")
             sleep(0.5) 
-            self.macro.click_image(button_image_name, confidence=confidence)
+            self.macro.click_image("shop.png",)
 
             self.macro.click_center()
             logging.info("GUI close sequence completed.")

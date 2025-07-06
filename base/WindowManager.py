@@ -1,8 +1,8 @@
 import json
-import os
 import sys
 from time import sleep
 import pyautogui
+from screen_ocr import Reader
 
 
 class WindowManager:
@@ -13,7 +13,7 @@ class WindowManager:
         self.window = None
         self.yOffset = self.config['title_bar_offsets'].get(self.os_name, 30)
         self.xOffset = self.config['border_offsets'].get(self.os_name, 5)
-
+        self.ocr_reader = Reader.create_quality_reader()
 
     def _load_config(self, path):
         """Loads the JSON configuration file."""
@@ -67,3 +67,35 @@ class WindowManager:
         center_x = self.window.left + self.window.width // 2
         center_y = self.window.top + self.window.height // 2
         return (center_x, center_y)
+
+    def get_words_in_bounding_box(self, bounding_box):
+        """
+        Performs OCR on a screen region and returns a list of lowercase text lines.
+        
+        Args:
+            bounding_box: A tuple (left, top, right, bottom) defining the area.
+            ocr_reader: An initialized screen_ocr.Reader instance.
+
+        Returns:
+            A list of tuples, where each tuple contains:
+            - A lowercase string of the detected line of text.
+            - A tuple (x, y) for the line's center coordinates.
+        """
+        result = self.ocr_reader.read_screen(bounding_box)
+        
+        output = []
+        for line in result.result.lines:
+            if not line.words:
+                continue
+                
+            line_text = "".join(word.text + " " for word in line.words).strip().lower()
+            
+            first_word = line.words[0]
+            last_word = line.words[-1]
+            
+            mid_y = int(first_word.top + (first_word.height / 2))
+            mid_x = int((first_word.left + (last_word.left + last_word.width)) / 2)
+            
+            output.append((line_text, (mid_x, mid_y)))
+            
+        return output
